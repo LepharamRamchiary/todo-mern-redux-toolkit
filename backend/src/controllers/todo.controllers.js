@@ -32,4 +32,18 @@ const gitTodoList = asyncHandler(async (req, res) => {
   }
 });
 
-export { addText, gitTodoList };
+const updateTodo = asyncHandler(async (req, res) => {
+  try {
+    const updateTodo = await Todo.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, updateTodo, "Update the todo sucessfully!"));
+  } catch (error) {
+    throw new ApiError(400, "Something want wrong when update");
+  }
+});
+
+export { addText, gitTodoList, updateTodo };
