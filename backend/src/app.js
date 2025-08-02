@@ -13,7 +13,9 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 // import routes
+import todoRouter from "./routes/todo.roures.js";
 
 // routes declaraction
+app.use("/api/todo", todoRouter);
 
 export { app };
