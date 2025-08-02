@@ -46,4 +46,16 @@ const updateTodo = asyncHandler(async (req, res) => {
   }
 });
 
-export { addText, gitTodoList, updateTodo };
+const deleteTodo = asyncHandler(async (req, res) => {
+  try {
+    const todo = await Todo.findByIdAndDelete(req.params.id);
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, todo, "Todo Deleted sucessfully!"));
+  } catch (error) {
+    throw new ApiError(500, "Something want wrong in deleteing the todo");
+  }
+});
+
+export { addText, gitTodoList, updateTodo, deleteTodo };
