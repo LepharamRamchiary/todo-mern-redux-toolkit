@@ -18,4 +18,18 @@ const addText = asyncHandler(async (req, res) => {
   }
 });
 
-export { addText };
+const gitTodoList = asyncHandler(async (req, res) => {
+  try {
+    const todos = await Todo.find();
+    return res
+      .status(200)
+      .json(new ApiResponse(200, todos, "All todos retrieve sucessfully!"));
+  } catch (error) {
+    throw new ApiError(
+      500,
+      "Something going wrong when retrieve the all todos"
+    );
+  }
+});
+
+export { addText, gitTodoList };
