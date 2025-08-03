@@ -8,8 +8,8 @@ import {
 
 const router = Router();
 
-router.route("/").post(addText);
-router.route("/get-todo-list").get(gitTodoList);
+router.route("/add-todo").post(addText);
+router.route("/").get(gitTodoList);
 router.route("/:id").put(updateTodo);
 router.route("/:id").delete(deleteTodo);
 
