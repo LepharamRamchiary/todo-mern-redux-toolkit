@@ -8,7 +8,7 @@ import {
 
 const router = Router();
 
-router.route("/add-todo").post(addText);
+router.route("/add").post(addText);
 router.route("/").get(gitTodoList);
 router.route("/:id").put(updateTodo);
 router.route("/:id").delete(deleteTodo);
