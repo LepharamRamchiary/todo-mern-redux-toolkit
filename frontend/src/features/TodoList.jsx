@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchTodos, addTodo, updateTodo, deleteTodo } from "./todoSlice.js";
-import { Plus, Trash2, CheckCircle2, Circle, AlertCircle, Loader2 } from "lucide-react";
+import { Plus, Trash2, CheckCircle2, Circle, AlertCircle, Loader2, Edit3, Check, X } from "lucide-react";
 
 export default function TodoList() {
   const [newTodo, setNewTodo] = useState("");
+  const [editingTodo, setEditingTodo] = useState(null);
+  const [editText, setEditText] = useState("");
   
   const todosState = useSelector((state) => {
     console.log("Full Redux state:", state);
@@ -41,6 +43,39 @@ export default function TodoList() {
         console.error("Error adding todo:", error);
       }
     }
+  };
+
+  const handleEditStart = (todo) => {
+    setEditingTodo(todo._id);
+    setEditText(todo.text || todo.title || "");
+  };
+
+  const handleEditSave = async (todoId) => {
+    if (editText.trim() && editText.trim() !== "") {
+      try {
+        const result = await dispatch(updateTodo({ 
+          id: todoId, 
+          data: { text: editText.trim() } 
+        }));
+        if (updateTodo.fulfilled.match(result)) {
+          setEditingTodo(null);
+          setEditText("");
+        } else {
+          console.error("Failed to update todo:", result.error);
+        }
+      } catch (error) {
+        console.error("Error updating todo:", error);
+      }
+    }
+  };
+
+  const handleEditCancel = () => {
+    setEditingTodo(null);
+    setEditText("");
+  };
+
+  const handleToggleComplete = (todo) => {
+    dispatch(updateTodo({ id: todo._id, data: { completed: !todo.completed } }));
   };
 
   const completedCount = todos.filter(todo => todo.completed).length;
@@ -164,9 +199,7 @@ export default function TodoList() {
                 >
                   <div className="flex items-start gap-4">
                     <button
-                      onClick={() =>
-                        dispatch(updateTodo({ id: todo._id, data: { completed: !todo.completed } }))
-                      }
+                      onClick={() => handleToggleComplete(todo)}
                       className="flex-shrink-0 mt-1 transition-colors duration-200"
                     >
                       {todo.completed ? (
@@ -177,18 +210,54 @@ export default function TodoList() {
                     </button>
                     
                     <div className="flex-1 min-w-0">
-                      <p
-                        className={`text-base cursor-pointer transition-all duration-200 ${
-                          todo.completed 
-                            ? "line-through text-slate-400" 
-                            : "text-slate-700 hover:text-slate-900"
-                        }`}
-                        onClick={() =>
-                          dispatch(updateTodo({ id: todo._id, data: { completed: !todo.completed } }))
-                        }
-                      >
-                        {todo.text || todo.title || "No text"}
-                      </p>
+                      {editingTodo === todo._id ? (
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={editText}
+                            onChange={(e) => setEditText(e.target.value)}
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter') handleEditSave(todo._id);
+                              if (e.key === 'Escape') handleEditCancel();
+                            }}
+                            className="flex-1 px-3 py-2 text-sm bg-white border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            autoFocus
+                          />
+                          <button
+                            onClick={() => handleEditSave(todo._id)}
+                            className="p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition-colors"
+                            title="Save changes"
+                          >
+                            <Check className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={handleEditCancel}
+                            className="p-1.5 text-red-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                            title="Cancel editing"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 group/text">
+                          <p
+                            className={`text-base flex-1 transition-all duration-200 ${
+                              todo.completed 
+                                ? "line-through text-slate-400" 
+                                : "text-slate-700"
+                            }`}
+                          >
+                            {todo.text || todo.title || "No text"}
+                          </p>
+                          <button
+                            onClick={() => handleEditStart(todo)}
+                            className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded transition-all duration-200 opacity-0 group-hover:opacity-100 group/text-hover:opacity-100"
+                            title="Edit task"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
                       {todo.completed && (
                         <p className="text-xs text-green-600 mt-1 font-medium">
                           ✓ Completed
