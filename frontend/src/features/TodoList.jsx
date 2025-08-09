@@ -85,7 +85,7 @@ export default function TodoList() {
   console.log("Status:", status);
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-slate-50 to-slate-100 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 sm:p-6 lg:p-8">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-xl border border-slate-200 mb-6">
