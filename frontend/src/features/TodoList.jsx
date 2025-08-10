@@ -46,6 +46,9 @@ export default function TodoList() {
   };
 
   const handleEditStart = (todo) => {
+    // Prevent editing if task is completed
+    if (todo.completed) return;
+    
     setEditingTodo(todo._id);
     setEditText(todo.text || todo.title || "");
   };
@@ -75,6 +78,12 @@ export default function TodoList() {
   };
 
   const handleToggleComplete = (todo) => {
+    // If task is being edited and we're marking it as complete, cancel the edit
+    if (editingTodo === todo._id && !todo.completed) {
+      setEditingTodo(null);
+      setEditText("");
+    }
+    
     dispatch(updateTodo({ id: todo._id, data: { completed: !todo.completed } }));
   };
 
@@ -249,13 +258,16 @@ export default function TodoList() {
                           >
                             {todo.text || todo.title || "No text"}
                           </p>
-                          <button
-                            onClick={() => handleEditStart(todo)}
-                            className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded transition-all duration-200 opacity-0 group-hover:opacity-100 group/text-hover:opacity-100"
-                            title="Edit task"
-                          >
-                            <Edit3 className="w-4 h-4" />
-                          </button>
+                          {/* Only show edit button for incomplete tasks */}
+                          {!todo.completed && (
+                            <button
+                              onClick={() => handleEditStart(todo)}
+                              className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded transition-all duration-200 opacity-0 group-hover:opacity-100 group/text-hover:opacity-100"
+                              title="Edit task"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                          )}
                         </div>
                       )}
                       {todo.completed && (
